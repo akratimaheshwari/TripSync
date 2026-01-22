@@ -1,14 +1,28 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import {Server} from "socket.io";
+import http from "http";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
+
 dotenv.config();
-
 const app = express();
+const server = http.createServer(app);
 
+
+const io = new Server(server, {
+  cors: { origin: "*" }
+});
+
+//  THIS MUST COME BEFORE ROUTES
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 // Connect DB
 connectDB();
 
@@ -19,6 +33,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
+app.use("/api/expenses",expenseRoutes);
 
 app.get("/", (req, res) => {
   res.send("TripSync Backend Running");
