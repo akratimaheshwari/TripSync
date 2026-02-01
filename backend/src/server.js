@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
+import 'dotenv/config';
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import {Server} from "socket.io";
 import http from "http";
 
@@ -8,8 +11,9 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
 
-dotenv.config();
+// dotenv.config(); // Removed duplicate call
 const app = express();
 const server = http.createServer(app);
 
@@ -34,6 +38,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/expenses",expenseRoutes);
+app.use("/api/documents", documentRoutes);
 
 app.get("/", (req, res) => {
   res.send("TripSync Backend Running");
