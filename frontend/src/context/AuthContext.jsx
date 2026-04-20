@@ -1,33 +1,56 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from "../services/api";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  // LOGIN
   const login = async (email, password) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setUser({
-      id: '1',
-      name: 'Alex Johnson',
-      email: email,
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
+    const { data } = await api.post("/auth/login", {
+      email,
+      password,
     });
+
+    localStorage.setItem("token", data.token);
+    setUser(data.user);
   };
 
+  // REGISTER (REAL BACKEND)
   const register = async (name, email, password) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setUser({
-      id: '1',
-      name: name,
-      email: email,
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
+    await api.post("/auth/register", {
+      name,
+      email,
+      password,
     });
+    await login(email, password);
   };
 
+  // LOGOUT
   const logout = () => {
+    localStorage.removeItem("token"); //  important
     setUser(null);
   };
+
+  // AUTO LOGIN (REAL USER FETCH)
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await api.get("/auth/me");
+        setUser(data);
+      } catch (err) {
+        localStorage.removeItem("token");
+        setUser(null);
+      }
+    };
+
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      fetchUser();
+    }
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -33,6 +33,7 @@ export const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
+    console.log("User from DB:", user);
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -58,5 +59,23 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(400).json({ message: "Invalid user data" });
+    }
+
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 };

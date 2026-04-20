@@ -27,8 +27,8 @@ export const Login = () => {
       await login(email, password);
       setShowToast(true);
       setTimeout(() => navigate('/dashboard'), 1000);
-    } catch {
-      setError('Invalid email or password');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password');
     }
   };
 

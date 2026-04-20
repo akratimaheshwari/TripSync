@@ -14,8 +14,8 @@ export const createTrip = async (req, res) => {
       endDate,
       coverImage,
       currency,
-      admin: req.user,
-      members: [req.user],
+      admin: req.user.id,
+      members: [req.user.id],
       joinCode
     });
 
@@ -36,8 +36,8 @@ export const joinTrip = async (req, res) => {
       return res.status(404).json({ message: "Invalid join code" });
     }
 
-    if (!trip.members.includes(req.user)) {
-      trip.members.push(req.user);
+    if (!trip.members.includes(req.user.id)) {
+      trip.members.push(req.user.id);
       await trip.save();
     }
 
@@ -59,6 +59,42 @@ export const getTrip = async (req, res) => {
     }
 
     res.json(trip);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+export const getMyTrips = async (req, res) => {
+  try {
+    const trips = await Trip.find({
+      members: req.user.id
+    });
+
+    res.json(trips);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+export const deleteTrip = async (req, res) => {
+  try {
+    const tripId = req.params.id;
+
+    // find trip
+    const trip = await Trip.findById(tripId);
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    //  only admin can delete
+    if (trip.admin.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    // delete trip
+    await Trip.findByIdAndDelete(tripId);
+
+    res.json({ message: "Trip deleted successfully" });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

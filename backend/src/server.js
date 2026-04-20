@@ -19,7 +19,9 @@ const server = http.createServer(app);
 
 
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: { origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+   }
 });
 
 //  THIS MUST COME BEFORE ROUTES
@@ -31,7 +33,10 @@ app.use((req, res, next) => {
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -45,6 +50,6 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

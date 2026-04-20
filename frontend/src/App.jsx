@@ -13,6 +13,7 @@ import { BudgetPlanner } from './pages/BudgetPlanner';
 import { Explore } from './pages/Explore';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
+import { JoinTrip } from './pages/JoinTrips';
 
 // Removed the TypeScript interface and kept it simple for JSX
 const ProtectedRoute = ({ children }) => {
@@ -123,6 +124,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/join-trip" element={<JoinTrip />} />
           </Routes>
         </TripProvider>
       </AuthProvider>
